@@ -1,0 +1,124 @@
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.Scanner;
+
+public class TodoList {
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) throws Exception {
+        connector connect = new connector();
+        Connection conn;
+        conn = connect.getConnection();
+        Statement stmt;
+        stmt = conn.createStatement();
+//        stmt.executeUpdate("create Table TodoList(TaskName varchar(200) , date varchar(200) , DueDate varchar(200), Status varchar(200) ,TaskDescription varchar(200) )");
+
+        while (true) {
+            System.out.println("press Insert , updateDuedate  ,updateStatus , removeTask , changeDescription , QuitApp , DisplayTasks ,displayall");
+            String check = sc.nextLine();
+            if (check.equals("Insert")) {
+                PreparedStatement pstmt;
+                pstmt = conn.prepareCall("Insert into TodoList values (?,?,?,?,?)");
+                System.out.println("Enter task name  to be Entered ");
+                String taskname = sc.nextLine();
+                System.out.println("Enter the Date to Be Entered");
+                String date = sc.nextLine();
+                System.out.println("Enter The Due Date ");
+                String duedate = sc.nextLine();
+                System.out.println("Enter The Status");
+                String status = sc.nextLine();
+                System.out.println("Enter The Task Description");
+                String taskdesc = sc.nextLine();
+                pstmt.setString(1, taskname);
+                pstmt.setString(2, date);
+                pstmt.setString(3, duedate);
+                pstmt.setString(4, status);
+                pstmt.setString(5, taskdesc);
+                pstmt.executeUpdate();
+                System.out.println("*********************************************************************************");
+
+            }
+            if (check.equals("removeTask")) {
+                PreparedStatement pstmt1;
+                pstmt1 = conn.prepareCall("delete from TodoList where  TaskName = (?)");
+                System.out.println("enter the task to be deleted");
+                String del = sc.next();
+                pstmt1.setString(1,del );
+                pstmt1.executeUpdate();
+                System.out.println("*********************************************************************************");
+
+
+            }
+            if (check.equals("updateStatus")) {
+                PreparedStatement pstmt2;
+
+                pstmt2 = conn.prepareCall("update TodoList set Status = (?) where TaskName = (?)");
+                System.out.println("enter the TaskName to be updated");
+                String tas = sc.next();
+                System.out.println("enter the status");
+                String status = sc.next();
+
+               pstmt2.setString(2,tas);
+               pstmt2.setString(1,status);
+               pstmt2.executeUpdate();
+                System.out.println("*********************************************************************************");
+
+            }
+            if (check.equals("updateDuedate")){
+                PreparedStatement pstmt3;
+                pstmt3 = conn.prepareCall("update TodoList  set DueDate = (?) where TaskName = (?)");
+                System.out.println("enter the TaskName to be updated");
+                String  Taskname = sc.next();
+                pstmt3.setString(2,Taskname);
+                System.out.println("enter the new duedate");
+                String  duedate = sc.next();
+                pstmt3.setString(1,duedate);
+                pstmt3.executeUpdate();
+                System.out.println("*********************************************************************************");
+
+            }
+            if (check.equals("changeDescription")){
+                PreparedStatement pstmt4;
+                pstmt4 = conn.prepareCall("update TodoList set TaskDescription = (?) where TaskName = (?)");
+                System.out.println("enter the TaskName to be updated");
+                String  tasks = sc.next();
+                System.out.println("enter the description");
+                String  description = sc.next();
+                pstmt4.setString(1,description);
+                pstmt4.setString(2,tasks);
+                pstmt4.executeUpdate();
+                System.out.println("*********************************************************************************");
+
+
+            }
+            if (check.equals("DisplayTasks")){
+                PreparedStatement preparedStatement ;
+                preparedStatement = conn.prepareCall("select * from TodoList where TaskName = (?) ");
+                String ts = sc.nextLine();
+                preparedStatement.setString(1,ts);
+                ResultSet rs ;
+                rs =preparedStatement.executeQuery();
+                while (rs.next()){
+                    System.out.println(rs.getString(1) + " " + rs.getString(2) + " " + rs.getString(3) + " " + rs.getString(4) + " " + rs.getString(5));
+                }
+                System.out.println("*********************************************************************************");
+
+            }
+            if (check.equals("displayall")){
+                PreparedStatement pstate ;
+                 pstate = conn.prepareCall("select * from TodoList");
+                 ResultSet rst = pstate.executeQuery();
+                 while (rst.next()){
+                     System.out.println(rst.getString(1) + " " + rst.getString(2) + " "+  rst.getString(3) + " " +  rst.getString(4) + " " +rst.getString(5)) ;
+                 }
+
+            }
+            if (check.equals("QuitApp")){
+                System.out.println("Quitted");
+                break;
+            }
+        }
+    }
+}
